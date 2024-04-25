@@ -7,17 +7,19 @@
 int main(int argc, char *argv[])
 {
 	if(argc < 2){		//no programs
+		printf("no programs \n");
 		exit(22);
 	}
 
 	int n = argc - 1;	//num of programs
 	int fds[n - 1][2];   // 1 less pipe then process
-
+	int pids[n];
 
 	//make all pipes
 	for(int i = 0; i < n - 1; i++) {
 		if(pipe(fds[i]) == -1){//error
-			exit(0); //which error?
+			printf("error piping \n");
+			exit(EXIT_FAILURE);
 		}	
 	}
 
@@ -26,18 +28,14 @@ int main(int argc, char *argv[])
 	//special case: i = 0 -> don't redirect input
 	//special case: i = n-1 -> don't redirect output
 	for(int i = 0; i < n; i++) {
-		int pid;
-		pid = fork();
-		if(pid == 0){
-		//child process
-
+		pids[i] = fork();
+		if(pids[i] == 0){ //child process
 			for (int j = 0; j < n - 1; j++) {
-                if (j != i || j != (i - 1)) {
+                if (j != i && j != (i - 1)) {
                     close(fds[j][0]);
                     close(fds[j][1]);
                 }
             }
-
 			//redirect output to pipe[i]
 			if (i < n - 1){   //i is 0 to n - 1
 				close(fds[i][0]);
@@ -45,33 +43,41 @@ int main(int argc, char *argv[])
 				close(fds[i][1]);
 			}
 			//redirect input to output of pipe[i - 1]
-			else if (i != 0){  //i is anything except 0
+			if (i != 0){  //i is anything except 0
 				close(fds[i - 1][1]);
 				dup2(fds[i - 1][0], 0);
 				close(fds[i - 1][0]);
 			}
 			execlp(argv[i + 1], argv[i + 1], NULL);
-
-			exit(0);
+			printf("invalid program \n");
+			exit(EXIT_FAILURE);
 		}
-
-		//parent process
-		else if (pid > 0){
-			int status;
-			waitpid(pid, &status, 0);
-			if (WIFEXITED(status)) {	// Child process terminated normally
-            	printf("Child process exited with status: %d\n", WEXITSTATUS(status));
-        	} else {	// Child process terminated abnormally
-            	printf("Child process terminated abnormally\n");
-				//error?
-        	}
-
-			exit(0);
-		}
-
-		else{
-			exit(22); //error (which exit?)
+		else if (pids[i] < 0){
+			printf("error forking \n");
+			exit(EXIT_FAILURE);
 		}
 	}
+
+	//close all pipes
+	for (int i = 0; i < n - 1; i++) {
+        close(fds[i][0]);
+        close(fds[i][1]);
+    }
+
+    //wait
+    for (int i = 0; i < n; i++) {
+        int status;
+        if (waitpid(pids[i], &status, 0) == -1) {
+            printf("error waiting");
+            exit(EXIT_FAILURE);
+        }
+        if (WIFEXITED(status)) {
+            printf("Child process %d exited with status %d\n", (i + 1), WEXITSTATUS(status));
+        } else {
+            printf("Child process %d exited abnormally\n", (i + 1));
+			exit(EXIT_FAILURE);
+        }
+    }
+
 	return 0;
 }
