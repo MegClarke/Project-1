@@ -7,7 +7,7 @@
 int main(int argc, char *argv[])
 {
 	if(argc < 2){		//no programs
-		printf("no programs \n");
+		perror("no programs \n");
 		exit(22);
 	}
 
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 	//make all pipes
 	for(int i = 0; i < n - 1; i++) {
 		if(pipe(fds[i]) == -1){//error
-			printf("error piping \n");
+			perror("error piping \n");
 			exit(EXIT_FAILURE);
 		}	
 	}
@@ -49,11 +49,11 @@ int main(int argc, char *argv[])
 				close(fds[i - 1][0]);
 			}
 			execlp(argv[i + 1], argv[i + 1], NULL);
-			printf("invalid program \n");
+			perror("invalid program \n");
 			exit(EXIT_FAILURE);
 		}
 		else if (pids[i] < 0){
-			printf("error forking \n");
+			perror("error forking \n");
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -68,13 +68,13 @@ int main(int argc, char *argv[])
     for (int i = 0; i < n; i++) {
         int status;
         if (waitpid(pids[i], &status, 0) == -1) {
-            printf("error waiting");
+            perror("error waiting");
             exit(EXIT_FAILURE);
         }
         if (WIFEXITED(status)) {
-            printf("Child process %d exited with status %d\n", (i + 1), WEXITSTATUS(status));
+            perror("Child process %d exited with status %d\n", (i + 1), WEXITSTATUS(status));
         } else {
-            printf("Child process %d exited abnormally\n", (i + 1));
+            perror("Child process %d exited abnormally\n", (i + 1));
 			exit(EXIT_FAILURE);
         }
     }
