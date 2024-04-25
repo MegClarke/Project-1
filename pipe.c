@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <errno.h>
 
 int main(int argc, char *argv[])
 {
 	if(argc < 2){		//no programs
 		//printf("no programs \n");
-		exit(22);
+		exit(EINVAL);
 	}
 
 	int n = argc - 1;	//num of programs
@@ -22,7 +23,7 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}	
 	}
-
+	
 	//run each command
 	//each command takes input from pipe[i-1] & puts output into pipe[i]
 	//special case: i = 0 -> don't redirect input
