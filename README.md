@@ -1,17 +1,34 @@
-## UID: 123456789
+## UID: 706058350
 
 ## Pipe Up
 
-One sentence description
+This module replicates the functionality of the pipe (|) operator, allowing users to pass in executable names as command line arguments.
 
 ## Building
 
-Explain briefly how to build your program
+'''
+make
+'''
 
 ## Running
 
-Show an example run of your program, using at least two additional arguments, and what to expect
+'''
+./pipe ls sort cat
+'''
+I ran the command inside the git repo directly after building my program and it sorted and printed out all the files in the repo. 
+
+Result:
+Makefile
+pipe
+pipe.c
+pipe.o
+README.md
+test_lab1.py
+
+
 
 ## Cleaning up
 
-Explain briefly how to clean up all binary files
+'''
+make clean
+'''
