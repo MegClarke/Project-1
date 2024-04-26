@@ -6,15 +6,15 @@ This module replicates the functionality of the pipe (|) operator, allowing user
 
 ## Building
 
-'''
+```shell
 make
-'''
+```
 
 ## Running
 
-'''
+```shell
 ./pipe ls sort cat
-'''
+```
 I ran the command inside the git repo directly after building my program and it sorted and printed out all the files in the repo. 
 
 Result:
@@ -29,6 +29,6 @@ test_lab1.py
 
 ## Cleaning up
 
-'''
+```shell
 make clean
-'''
+```
